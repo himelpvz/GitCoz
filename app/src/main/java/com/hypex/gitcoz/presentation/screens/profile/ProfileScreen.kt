@@ -212,7 +212,7 @@ fun RepoItem(repo: GitHubRepository, onClick: () -> Unit) {
         value1 = repo.language,
         label2 = "Stars",
         value2 = "⭐ ${repo.stars}",
-        buttonText = "Checkout Code",
+        buttonText = "Checkout",
         githubUrl = repo.htmlUrl,
         isPremium = false,
         isRepo = true,

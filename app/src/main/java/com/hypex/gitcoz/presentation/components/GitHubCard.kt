@@ -35,7 +35,7 @@ fun GitHubCard(
     value1: String,
     label2: String,
     value2: String,
-    buttonText: String,
+    buttonText: String = "Checkout",
     githubUrl: String? = null,
     isPremium: Boolean = true,
     isRepo: Boolean = false,

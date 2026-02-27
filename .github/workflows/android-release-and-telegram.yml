@@ -112,13 +112,19 @@ jobs:
             STATUS="Release build failed"
           fi
 
+          if [ -f /tmp/release-notes.txt ]; then
+            RELEASE_NOTES=$(cat /tmp/release-notes.txt)
+          else
+            RELEASE_NOTES="No changelog section found."
+          fi
+
           MESSAGE=$(printf '%s\n' \
-            "<b>GitCoz Release Build</b>" \
+            "<b>GitCoz Release</b>" \
             "$STATUS" \
-            "Repo: $GITHUB_REPO" \
-            "Ref: $GITHUB_REF" \
+            "Tag: ${GITHUB_REF#refs/tags/}" \
             "Commit: ${GITHUB_SHA:0:7}" \
-            "Run: $GITHUB_SERVER_URL/$GITHUB_REPO/actions/runs/$GITHUB_RUN_ID")
+            "" \
+            "$RELEASE_NOTES")
 
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             -d chat_id="$TELEGRAM_CHAT_ID" \
