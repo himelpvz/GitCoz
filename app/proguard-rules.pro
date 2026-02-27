@@ -19,3 +19,21 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# --- Retrofit/Gson keep rules (release builds) ---
+-keepattributes Signature,RuntimeVisibleAnnotations,AnnotationDefault
+-keep class retrofit2.** { *; }
+-keepclassmembers class * {
+    @retrofit2.http.* <methods>;
+}
+-keep class com.google.gson.** { *; }
+-keep class com.google.gson.stream.** { *; }
+-dontwarn okhttp3.**
+-keep class okhttp3.** { *; }
+
+# --- App models (Gson reflection) ---
+-keep class com.hypex.gitcoz.data.model.** { *; }
+-keep class com.hypex.gitcoz.domain.model.** { *; }
+
+# Kotlin metadata for reflection
+-keep class kotlin.Metadata { *; }
