@@ -132,11 +132,16 @@ jobs:
             --data-urlencode text="$MESSAGE" > /dev/null
 
           if [ "$JOB_STATUS" = "success" ]; then
-            for apk in app/build/outputs/apk/release/*.apk; do
-              if [ -f "$apk" ]; then
-                curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
-                  -F chat_id="$TELEGRAM_CHAT_ID" \
-                  -F document=@"$apk" > /dev/null
-              fi
-            done
+            if ls app/build/outputs/apk/release/*.apk >/dev/null 2>&1; then
+              for apk in app/build/outputs/apk/release/*.apk; do
+                if [ -f "$apk" ]; then
+                  curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
+                    -F chat_id="$TELEGRAM_CHAT_ID" \
+                    -F document=@"$apk" > /dev/null || \
+                    echo "Telegram upload failed for $apk"
+                fi
+              done
+            else
+              echo "No APKs found to upload to Telegram."
+            fi
           fi
