@@ -1,0 +1,8 @@
+# Project-wide Gradle settings.
+org.gradle.jvmargs=-Xmx4608m -Dfile.encoding=UTF-8
+android.enableR8.fullMode=true
+android.useAndroidX=true
+
+# Telegram feedback integration (set your own values)
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_CHAT_ID=

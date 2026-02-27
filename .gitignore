@@ -1,34 +1,39 @@
-# Gradle files
+# AndroidPE/Termux local dirs
+.androidide/
+.androidpe/
+
+# Gradle/build
 .gradle/
+.kotlin/
 build/
+bin/
+gen/
+out/
 
-# Local configuration file (sdk path, etc)
-local.properties
-
-# Log/OS Files
-*.log
-
-# Android Studio generated files and folders
-captures/
+# Native build
 .externalNativeBuild/
 .cxx/
+
+# Local config and secrets
+local.properties
+gradle.properties
+
+# Generated outputs
 *.aab
 *.apk
 output-metadata.json
 
-# IntelliJ
+# IDE
 *.iml
 .idea/
-misc.xml
-deploymentTargetDropDown.xml
-render.experimental.xml
 
-# Keystore files
+# Logs/profiling
+*.log
+*.hprof
+
+# Signing keys
 *.jks
 *.keystore
 
-# Google Services (e.g. APIs or Firebase)
+# Google services
 google-services.json
-
-# Android Profiling
-*.hprof
