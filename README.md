@@ -26,8 +26,8 @@ GitCoz is a premium-styled Android GitHub explorer built with Kotlin and Jetpack
 - Android device/emulator (minSdk 32)
 
 ## Setup
-1. Create `gradle.properties` from the example:
-   - use `gradle.properties.example`
+1. Create `gradle.properties.local` for secrets:
+   - Use `gradle.properties.example` as a template.
 2. Fill your values:
    - `TELEGRAM_BOT_TOKEN`
    - `TELEGRAM_CHAT_ID`

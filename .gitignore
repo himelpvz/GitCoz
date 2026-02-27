@@ -16,7 +16,7 @@ out/
 
 # Local config and secrets
 local.properties
-gradle.properties
+gradle.properties.local
 
 # Generated outputs
 *.aab
