@@ -47,17 +47,24 @@ jobs:
           chmod +x gradlew
           ./gradlew --no-daemon clean assembleRelease
 
-      - name: Upload release APKs
+      - name: Upload release APKs (artifact)
         uses: actions/upload-artifact@v4
         with:
           name: gitcoz-signed-release-apks
           path: app/build/outputs/apk/release/*.apk
+          if-no-files-found: error
 
-      - name: Upload mapping files
+      - name: Upload mapping files (artifact)
         uses: actions/upload-artifact@v4
         with:
           name: gitcoz-release-mapping
           path: app/build/outputs/mapping/release/*
+          if-no-files-found: warn
+
+      - name: Verify release APKs
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          ls -lah app/build/outputs/apk/release
 
       - name: Extract changelog for tag
         if: startsWith(github.ref, 'refs/tags/')
@@ -78,6 +85,7 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
           body_path: /tmp/release-notes.txt
+          fail_on_unmatched_files: true
           files: |
             app/build/outputs/apk/release/*.apk
 
