@@ -2,9 +2,6 @@ name: Android Debug Build
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
 
 permissions:
   contents: read
