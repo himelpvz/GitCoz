@@ -39,6 +39,15 @@ sh ./gradlew installDebug
 sh ./gradlew assembleRelease
 ```
 
+## GitHub Actions Signed Release
+Workflow: `.github/workflows/android-signed-release.yml`
+
+Add these repository secrets before running:
+- `ANDROID_SIGNING_KEYSTORE_BASE64`
+- `ANDROID_SIGNING_STORE_PASSWORD`
+- `ANDROID_SIGNING_KEY_ALIAS`
+- `ANDROID_SIGNING_KEY_PASSWORD`
+
 ## APK Size Notes
 - Debug APK can be large (~70MB) due to no shrink/minify.
 - Release uses minify + resource shrink + ABI split APKs for much smaller output.

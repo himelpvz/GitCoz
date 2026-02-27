@@ -8,6 +8,21 @@ android {
     namespace = "com.hypex.gitcoz"
     compileSdk = 35
 
+    val signingStoreFile = (System.getenv("ANDROID_SIGNING_STORE_FILE")
+        ?: project.findProperty("ANDROID_SIGNING_STORE_FILE") as String?).orEmpty()
+    val signingStorePassword = (System.getenv("ANDROID_SIGNING_STORE_PASSWORD")
+        ?: project.findProperty("ANDROID_SIGNING_STORE_PASSWORD") as String?).orEmpty()
+    val signingKeyAlias = (System.getenv("ANDROID_SIGNING_KEY_ALIAS")
+        ?: project.findProperty("ANDROID_SIGNING_KEY_ALIAS") as String?).orEmpty()
+    val signingKeyPassword = (System.getenv("ANDROID_SIGNING_KEY_PASSWORD")
+        ?: project.findProperty("ANDROID_SIGNING_KEY_PASSWORD") as String?).orEmpty()
+
+    val hasReleaseSigning =
+        signingStoreFile.isNotBlank() &&
+            signingStorePassword.isNotBlank() &&
+            signingKeyAlias.isNotBlank() &&
+            signingKeyPassword.isNotBlank()
+
     defaultConfig {
         applicationId = "com.hypex.gitcoz"
         minSdk = 32
@@ -26,10 +41,24 @@ android {
         buildConfigField("String", "TELEGRAM_CHAT_ID", "\"$telegramChatId\"")
     }
 
+    signingConfigs {
+        create("release") {
+            if (hasReleaseSigning) {
+                storeFile = file(signingStoreFile)
+                storePassword = signingStorePassword
+                keyAlias = signingKeyAlias
+                keyPassword = signingKeyPassword
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -61,6 +90,7 @@ android {
             isUniversalApk = false
         }
     }
+
 }
 
 kotlin {
