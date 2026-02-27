@@ -114,6 +114,7 @@ fun ProfileDetailScreen(
                                             label2 = "Stars",
                                             value2 = "${repo.stars}",
                                             buttonText = "View Repository",
+                                            githubUrl = repo.htmlUrl,
                                             isPremium = false,
                                             isRepo = true,
                                             onButtonClick = { onNavigateToRepo(repo.ownerLogin, repo.name) }

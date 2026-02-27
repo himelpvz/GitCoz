@@ -1,0 +1,98 @@
+name: Android Release + Telegram Notify
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle cache
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Validate signing secrets
+        run: |
+          test -n "${{ secrets.ANDROID_SIGNING_KEYSTORE_BASE64 }}" || (echo "Missing secret: ANDROID_SIGNING_KEYSTORE_BASE64" && exit 1)
+          test -n "${{ secrets.ANDROID_SIGNING_STORE_PASSWORD }}" || (echo "Missing secret: ANDROID_SIGNING_STORE_PASSWORD" && exit 1)
+          test -n "${{ secrets.ANDROID_SIGNING_KEY_ALIAS }}" || (echo "Missing secret: ANDROID_SIGNING_KEY_ALIAS" && exit 1)
+          test -n "${{ secrets.ANDROID_SIGNING_KEY_PASSWORD }}" || (echo "Missing secret: ANDROID_SIGNING_KEY_PASSWORD" && exit 1)
+
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.ANDROID_SIGNING_KEYSTORE_BASE64 }}" | base64 --decode > "$RUNNER_TEMP/release.jks"
+
+      - name: Build signed release APKs
+        env:
+          ANDROID_SIGNING_STORE_FILE: ${{ runner.temp }}/release.jks
+          ANDROID_SIGNING_STORE_PASSWORD: ${{ secrets.ANDROID_SIGNING_STORE_PASSWORD }}
+          ANDROID_SIGNING_KEY_ALIAS: ${{ secrets.ANDROID_SIGNING_KEY_ALIAS }}
+          ANDROID_SIGNING_KEY_PASSWORD: ${{ secrets.ANDROID_SIGNING_KEY_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon clean assembleRelease
+
+      - name: Upload release APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitcoz-signed-release-apks
+          path: app/build/outputs/apk/release/*.apk
+
+      - name: Upload mapping files
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitcoz-release-mapping
+          path: app/build/outputs/mapping/release/*
+
+      - name: Notify Telegram
+        if: always()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GITHUB_REPO: ${{ github.repository }}
+          GITHUB_REF: ${{ github.ref }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+            echo "Telegram secrets not set, skipping notification"
+            exit 0
+          fi
+
+          if [ "$JOB_STATUS" = "success" ]; then
+            STATUS="Release build succeeded"
+          else
+            STATUS="Release build failed"
+          fi
+
+          MESSAGE=$(cat <<EOF
+<b>GitCoz Release Build</b>
+$STATUS
+Repo: $GITHUB_REPO
+Ref: $GITHUB_REF
+Commit: ${GITHUB_SHA:0:7}
+Run: $GITHUB_SERVER_URL/$GITHUB_REPO/actions/runs/$GITHUB_RUN_ID
+EOF
+          )
+
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d chat_id="$TELEGRAM_CHAT_ID" \
+            -d parse_mode=HTML \
+            --data-urlencode text="$MESSAGE" > /dev/null

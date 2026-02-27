@@ -46,4 +46,27 @@ class ProfileViewModel(
                 .launchIn(viewModelScope)
         }
     }
+
+    fun loadAuthenticatedProfile() {
+        viewModelScope.launch {
+            _state.update { it.copy(userState = UiState.Loading, reposState = UiState.Loading) }
+
+            try {
+                val user = repository.getAuthenticatedUser().first()
+                _state.update { it.copy(userState = UiState.Success(user)) }
+
+                repository.getUserRepos(user.login)
+                    .onEach { repos ->
+                        _state.update { it.copy(reposState = UiState.Success(repos)) }
+                    }
+                    .catch { e ->
+                        _state.update { it.copy(reposState = UiState.Error(e.message ?: "Unknown error")) }
+                    }
+                    .launchIn(viewModelScope)
+            } catch (e: Exception) {
+                val message = e.message ?: "Unknown error"
+                _state.update { it.copy(userState = UiState.Error(message), reposState = UiState.Error(message)) }
+            }
+        }
+    }
 }

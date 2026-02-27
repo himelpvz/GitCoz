@@ -271,6 +271,7 @@ fun TopRepoItem(repo: GitHubRepository, onClick: () -> Unit) {
         label2 = "Stars",
         value2 = "⭐ ${repo.stars}",
         buttonText = "View Project",
+        githubUrl = repo.htmlUrl,
         isPremium = true,
         isRepo = true,
         onButtonClick = onClick
@@ -289,6 +290,7 @@ fun TrendingRepoItem(repo: GitHubRepository, onClick: () -> Unit) {
         label2 = "Stars",
         value2 = "⭐ ${repo.stars}",
         buttonText = "Explore",
+        githubUrl = repo.htmlUrl,
         isPremium = false,
         isRepo = true,
         onButtonClick = onClick

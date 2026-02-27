@@ -174,6 +174,7 @@ fun ReleaseItem(release: GitHubRelease, onClick: () -> Unit) {
         label2 = "Global Rollout",
         value2 = release.publishedAt.take(10),
         buttonText = "Install Release",
+        githubUrl = release.htmlUrl,
         isPremium = true,
         onButtonClick = onClick
     )

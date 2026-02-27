@@ -51,6 +51,8 @@ fun ProfileScreen(
     LaunchedEffect(username) {
         if (!username.isNullOrBlank()) {
             viewModel.loadProfile(username)
+        } else {
+            viewModel.loadAuthenticatedProfile()
         }
     }
 
@@ -211,6 +213,7 @@ fun RepoItem(repo: GitHubRepository, onClick: () -> Unit) {
         label2 = "Stars",
         value2 = "⭐ ${repo.stars}",
         buttonText = "Checkout Code",
+        githubUrl = repo.htmlUrl,
         isPremium = false,
         isRepo = true,
         onButtonClick = onClick
